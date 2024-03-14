@@ -2,7 +2,7 @@ from fastapi_users import schemas
 
 
 class UserRead(schemas.BaseUser[int]):
-    """Pydantic-схема для чтения пользователя."""
+    """Pydantic-схема для чтения объекта пользователя."""
 
     pass
 

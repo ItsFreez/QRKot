@@ -7,7 +7,7 @@ from pydantic import BaseModel, Extra, Field
 from app.core.constants import NOT_VALID_AMOUNT
 
 
-class DonationBaseCreate(BaseModel):
+class DonationCreate(BaseModel):
     """Pydantic-схема для создания пожертвования."""
 
     full_amount: Annotated[int, Field(strict=True, gt=NOT_VALID_AMOUNT)]
@@ -17,7 +17,7 @@ class DonationBaseCreate(BaseModel):
         extra = Extra.forbid
 
 
-class DonationDBForUsers(DonationBaseCreate):
+class DonationDBForUsers(DonationCreate):
     """Pydantic-схема для чтения пожертвования пользователями."""
 
     id: int
