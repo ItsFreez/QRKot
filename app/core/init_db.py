@@ -16,6 +16,7 @@ get_user_manager_context = contextlib.asynccontextmanager(get_user_manager)
 async def create_user(
         email: EmailStr, password: str, is_superuser: bool = False
 ):
+    """Функция создающая пользователя с указанными атрибутами."""
     try:
         async with get_async_session_context() as session:
             async with get_user_db_context(session) as user_db:
@@ -32,6 +33,10 @@ async def create_user(
 
 
 async def create_first_superuser():
+    """
+    Функция выполняет проверку, что в настройках указаны имя и пароль для
+    суперпользователя и запускает процесс создания суперпользователя.
+    """
     if (settings.first_superuser_email is not None and
             settings.first_superuser_password is not None):
         await create_user(

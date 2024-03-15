@@ -11,7 +11,7 @@ class CRUDDonation(CRUDBase):
             self,
             user: User,
             session: AsyncSession
-    ):
+    ) -> list[Donation]:
         """Метод для получения всех объектов пожертвования для их владельца."""
         db_objs = await session.execute(
             select(self.model).where(

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.validators import (
-    check_actuallity_project, check_amount_not_less_invested,
+    check_actuallity_project, check_invested_amounts,
     check_name_duplicate, check_project_exists
 )
 from app.core.db import get_async_session
@@ -15,8 +15,8 @@ from app.services import investment
 router = APIRouter()
 
 
-@router.get('/', response_model=list[CharityProjectDB],
-            response_model_exclude_none=True)
+@router.get('/', summary='Получить список всех проектов',
+            response_model=list[CharityProjectDB], response_model_exclude_none=True)
 async def get_all_projects(
     session: AsyncSession = Depends(get_async_session)
 ):
@@ -25,7 +25,8 @@ async def get_all_projects(
     return all_projects
 
 
-@router.post('/', response_model=CharityProjectDB, response_model_exclude_none=True,
+@router.post('/', summary='Создать проект (суперюзер)',
+             response_model=CharityProjectDB, response_model_exclude_none=True,
              dependencies=[Depends(current_superuser)])
 async def create_project(
     project: CharityProjectCreate,
@@ -44,6 +45,7 @@ async def create_project(
 
 @router.patch(
     '/{project_id}',
+    summary='Обновить данные существующего проекта',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
@@ -60,8 +62,8 @@ async def partially_update_project(
     obj_in_data = obj_in.dict()
     if obj_in_data.get('name') is not None:
         await check_name_duplicate(obj_in_data['name'], session)
-    await check_amount_not_less_invested(
-        project, obj_in
+    await check_invested_amounts(
+        project, obj_in_data
     )
     project = await charity_project_crud.update_project(
         project, obj_in, session
@@ -71,6 +73,7 @@ async def partially_update_project(
 
 @router.delete(
     '/{project_id}',
+    summary='Удалить существующий проект',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],

@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import CharityProject, Donation
 
 
-def check_and_close_object(
+def close_object_after_check_invested_amount(
         obj: Union[CharityProject, Donation]
 ) -> Union[CharityProject, Donation]:
     """
@@ -43,7 +43,7 @@ async def investment(
 ) -> Union[CharityProject, Donation]:
     """
     Функция выполняет поиск открытых проектов/пожертвований и
-    запускает процесс инвестиций и закрытия проектов/пожертвований.
+    запускает процесс инвестиций с последующим закрытием проектов/пожертвований.
     """
     open_objs = await session.execute(
         select(open_model).where(
@@ -53,9 +53,9 @@ async def investment(
     open_objs = open_objs.scalars().all()
     for open_obj in open_objs:
         new_obj, open_obj = investment_counter(new_obj, open_obj)
-        open_obj = check_and_close_object(open_obj)
+        open_obj = close_object_after_check_invested_amount(open_obj)
         session.add(open_obj)
-        new_obj = check_and_close_object(new_obj)
+        new_obj = close_object_after_check_invested_amount(new_obj)
         if new_obj.fully_invested:
             break
     session.add(new_obj)

@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.base import CRUDBase
 from app.models import CharityProject
 from app.schemas import CharityProjectUpdate
-from app.services import check_and_close_object
+from app.services import close_object_after_check_invested_amount
 
 
 class CRUDCharityProject(CRUDBase):
@@ -17,6 +17,7 @@ class CRUDCharityProject(CRUDBase):
             project_name: str,
             session: AsyncSession,
     ) -> Optional[CharityProject]:
+        """Метод для получения проекта по его имени."""
         db_project = await session.execute(
             select(CharityProject).where(
                 CharityProject.name == project_name
@@ -30,14 +31,14 @@ class CRUDCharityProject(CRUDBase):
             db_obj: CharityProject,
             obj_in: CharityProjectUpdate,
             session: AsyncSession,
-    ):
+    ) -> CharityProject:
         """Метод для обновления данных проекта."""
         obj_data = jsonable_encoder(db_obj)
         update_data = obj_in.dict(exclude_unset=True)
         for field in obj_data:
             if field in update_data:
                 setattr(db_obj, field, update_data[field])
-        db_obj = check_and_close_object(db_obj)
+        db_obj = close_object_after_check_invested_amount(db_obj)
         session.add(db_obj)
         await session.commit()
         await session.refresh(db_obj)
@@ -47,7 +48,7 @@ class CRUDCharityProject(CRUDBase):
             self,
             db_obj: CharityProject,
             session: AsyncSession,
-    ):
+    ) -> CharityProject:
         """Метод для удаления проекта."""
         await session.delete(db_obj)
         await session.commit()

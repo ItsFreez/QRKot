@@ -1,1 +1,1 @@
-from .investment_service import check_and_close_object, investment # noqa
+from .investment_service import close_object_after_check_invested_amount, investment # noqa

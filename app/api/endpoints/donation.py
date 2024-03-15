@@ -11,7 +11,8 @@ from app.services import investment
 router = APIRouter()
 
 
-@router.get('/', response_model=list[DonationDBForSuperUser],
+@router.get('/', summary='Получить список всех пожертвований (суперюзер)',
+            response_model=list[DonationDBForSuperUser],
             response_model_exclude_none=True,
             dependencies=[Depends(current_superuser)])
 async def get_all_donations(
@@ -22,8 +23,9 @@ async def get_all_donations(
     return all_donations
 
 
-@router.post('/', response_model=DonationDBForUsers, response_model_exclude_none=True)
-async def create_reservation(
+@router.post('/', summary='Создать пожертвование',
+             response_model=DonationDBForUsers, response_model_exclude_none=True)
+async def create_donation(
     donation: DonationCreate,
     session: AsyncSession = Depends(get_async_session),
     user: User = Depends(current_user)
@@ -38,8 +40,8 @@ async def create_reservation(
     return new_donation
 
 
-@router.get('/my', response_model=list[DonationDBForUsers],
-            response_model_exclude_none=True)
+@router.get('/my', summary='Получить список пожертвований текущего пользователя',
+            response_model=list[DonationDBForUsers], response_model_exclude_none=True)
 async def get_owner_donations(
     session: AsyncSession = Depends(get_async_session),
     user: User = Depends(current_user)

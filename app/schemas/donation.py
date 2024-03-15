@@ -31,7 +31,7 @@ class DonationDBForUsers(DonationCreate):
 
 
 class DonationDBForSuperUser(DonationDBForUsers):
-    """Pydantic-схема для чтения пожертвования супер-пользователем."""
+    """Pydantic-схема для чтения пожертвования суперпользователем."""
 
     user_id: int
     invested_amount: int

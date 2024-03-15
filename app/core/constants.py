@@ -1,4 +1,5 @@
-DEFAULT_INV_AMOUNT = 0
-MIN_FULL_AMOUNT = 1
-MAX_LEN_NAME = 100
-MIN_LEN_NAME = 1
+# LIMITS FOR MODELS
+DEFAULT_INV_AMOUNT = 0  # Значение инвестируемой суммы по умолчанию для моделей
+MIN_FULL_AMOUNT = 1  # Минимальное значение для требуемой суммы инвестиций для моделей
+MAX_LEN_NAME = 100  # Максимальная длина имени для моделей
+MIN_LEN_STRING = 1  # Минимальная длина строки для моделей

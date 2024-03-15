@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import charity_project_crud
 from app.models import CharityProject
-from app.schemas import CharityProjectUpdate
 
 
 async def check_name_duplicate(
@@ -35,28 +34,30 @@ async def check_project_exists(
     return project
 
 
-async def check_amount_not_less_invested(
+async def check_invested_amounts(
         project: CharityProject,
-        obj_in: CharityProjectUpdate
+        obj_in_data: dict
 ) -> None:
-    """Функция выполняет проверку, что новая сумма не меньше, чем уже инвестированная."""
-    obj_in_data = obj_in.dict()
+    """
+    Функция выполняет проверку, что проект не закрыт и новая сумма
+    не меньше, чем уже инвестированная.
+    """
+    if project.fully_invested:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Нельзя изменять закрытый проект.'
+        )
     new_full_amount = obj_in_data.get('full_amount')
     if new_full_amount is not None and project.invested_amount > new_full_amount:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
-            detail='Нелья установить значение full_amount меньше уже вложенной суммы.'
-        )
-    if project.fully_invested:
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail='Нелья изменять закрытый проект.'
+            detail='Нельзя установить значение full_amount меньше уже вложенной суммы.'
         )
 
 
 async def check_actuallity_project(project: CharityProject) -> None:
     """Функция проверяет инвестировались ли уже деньги в проект."""
-    if project.fully_invested or project.invested_amount:
+    if project.invested_amount != 0:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail='В проект были внесены средства, не подлежит удалению!'

@@ -3,18 +3,19 @@ from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, PositiveInt, validator
 
-from app.core.constants import MAX_LEN_NAME, MIN_LEN_NAME, MIN_FULL_AMOUNT
+from app.core.constants import MAX_LEN_NAME, MIN_LEN_STRING
 
 
 class CharityProjectBase(BaseModel):
     """Базовая Pydantic-схема для проектов с основными настройками."""
 
-    name: Optional[str] = Field(None, min_length=MIN_LEN_NAME, max_length=MAX_LEN_NAME)
-    description: Optional[str] = Field(None, min_length=MIN_FULL_AMOUNT)
+    name: Optional[str] = Field(None, min_length=MIN_LEN_STRING, max_length=MAX_LEN_NAME)
+    description: Optional[str] = Field(None, min_length=MIN_LEN_STRING)
     full_amount: Optional[PositiveInt]
 
     @staticmethod
     def value_cannot_be_null(key, value):
+        """Метод проверяет что было получено значение, иначе вызывает исключение."""
         if value is None:
             raise ValueError(f'Поле {key} не может быть пустым!')
         return value
@@ -33,8 +34,8 @@ class CharityProjectBase(BaseModel):
 class CharityProjectCreate(CharityProjectBase):
     """Pydantic-схема для создания проекта."""
 
-    name: str = Field(..., min_length=MIN_LEN_NAME, max_length=MAX_LEN_NAME)
-    description: str = Field(..., min_length=MIN_FULL_AMOUNT)
+    name: str = Field(..., min_length=MIN_LEN_STRING, max_length=MAX_LEN_NAME)
+    description: str = Field(..., min_length=MIN_LEN_STRING)
     full_amount: PositiveInt
 
 
