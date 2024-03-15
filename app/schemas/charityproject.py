@@ -1,20 +1,19 @@
 from datetime import datetime
 from typing import Optional
-from typing_extensions import Annotated
 
-from pydantic import BaseModel, Extra, Field, validator
+from pydantic import BaseModel, Extra, Field, PositiveInt, validator
 
-from app.core.constants import MAX_LEN_NAME, MIN_LEN_NAME, NOT_VALID_AMOUNT
+from app.core.constants import MAX_LEN_NAME, MIN_LEN_NAME, MIN_FULL_AMOUNT
 
 
 class CharityProjectBase(BaseModel):
     """Базовая Pydantic-схема для проектов с основными настройками."""
 
     name: Optional[str] = Field(None, min_length=MIN_LEN_NAME, max_length=MAX_LEN_NAME)
-    description: Optional[str]
-    full_amount: Optional[Annotated[int, Field(strict=True, gt=NOT_VALID_AMOUNT)]]
+    description: Optional[str] = Field(None, min_length=MIN_FULL_AMOUNT)
+    full_amount: Optional[PositiveInt]
 
-    @classmethod
+    @staticmethod
     def value_cannot_be_null(key, value):
         if value is None:
             raise ValueError(f'Поле {key} не может быть пустым!')
@@ -22,14 +21,21 @@ class CharityProjectBase(BaseModel):
 
     class Config:
         extra = Extra.forbid
+        schema_extra = {
+            'example': {
+                'name': 'На корм пушистикам',
+                'description': 'Проект собирает деньги на помощь котикам, которым нечего кушать',
+                'full_amount': 10
+            }
+        }
 
 
 class CharityProjectCreate(CharityProjectBase):
     """Pydantic-схема для создания проекта."""
 
     name: str = Field(..., min_length=MIN_LEN_NAME, max_length=MAX_LEN_NAME)
-    description: str
-    full_amount: Annotated[int, Field(strict=True, gt=NOT_VALID_AMOUNT)]
+    description: str = Field(..., min_length=MIN_FULL_AMOUNT)
+    full_amount: PositiveInt
 
 
 class CharityProjectUpdate(CharityProjectBase):
@@ -40,11 +46,11 @@ class CharityProjectUpdate(CharityProjectBase):
         return cls.value_cannot_be_null('name', value)
 
     @validator('description')
-    def name_cannot_be_null(cls, value):
+    def description_cannot_be_null(cls, value):
         return cls.value_cannot_be_null('description', value)
 
     @validator('full_amount')
-    def name_cannot_be_null(cls, value):
+    def full_amount_cannot_be_null(cls, value):
         return cls.value_cannot_be_null('full_amount', value)
 
 

@@ -57,6 +57,9 @@ async def partially_update_project(
     project = await check_project_exists(
         project_id, session
     )
+    obj_in_data = obj_in.dict()
+    if obj_in_data.get('name') is not None:
+        await check_name_duplicate(obj_in_data['name'], session)
     await check_amount_not_less_invested(
         project, obj_in
     )

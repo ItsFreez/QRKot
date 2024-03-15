@@ -1,20 +1,23 @@
 from datetime import datetime
 from typing import Optional
-from typing_extensions import Annotated
 
-from pydantic import BaseModel, Extra, Field
-
-from app.core.constants import NOT_VALID_AMOUNT
+from pydantic import BaseModel, Extra, PositiveInt
 
 
 class DonationCreate(BaseModel):
     """Pydantic-схема для создания пожертвования."""
 
-    full_amount: Annotated[int, Field(strict=True, gt=NOT_VALID_AMOUNT)]
+    full_amount: PositiveInt
     comment: Optional[str]
 
     class Config:
         extra = Extra.forbid
+        schema_extra = {
+            'example': {
+                'full_amount': 10,
+                'comment': 'На корм бедным пушистикам.',
+            }
+        }
 
 
 class DonationDBForUsers(DonationCreate):

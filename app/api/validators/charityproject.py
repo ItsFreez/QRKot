@@ -47,6 +47,11 @@ async def check_amount_not_less_invested(
             status_code=HTTPStatus.BAD_REQUEST,
             detail='Нелья установить значение full_amount меньше уже вложенной суммы.'
         )
+    if project.fully_invested:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Нелья изменять закрытый проект.'
+        )
 
 
 async def check_actuallity_project(project: CharityProject) -> None:
