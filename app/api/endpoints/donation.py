@@ -32,11 +32,17 @@ async def create_donation(
 ):
     """Эндпоинт для создания пожертвований."""
     new_donation = await donation_crud.create(
-        donation, session, user
+        donation, session, user, commit=False
     )
-    new_donation = await investment(
-        new_donation, CharityProject, session
+    open_objs = await donation_crud.get_open_objects(
+        CharityProject, session
     )
+    if open_objs:
+        changed_objs = investment(new_donation, open_objs)
+        for obj in changed_objs:
+            session.add(obj)
+    await session.commit()
+    await session.refresh(new_donation)
     return new_donation
 
 

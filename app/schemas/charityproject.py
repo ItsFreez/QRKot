@@ -9,8 +9,8 @@ from app.core.constants import MAX_LEN_NAME, MIN_LEN_STRING
 class CharityProjectBase(BaseModel):
     """Базовая Pydantic-схема для проектов с основными настройками."""
 
-    name: Optional[str] = Field(None, min_length=MIN_LEN_STRING, max_length=MAX_LEN_NAME)
-    description: Optional[str] = Field(None, min_length=MIN_LEN_STRING)
+    name: Optional[str] = Field(None, max_length=MAX_LEN_NAME)
+    description: Optional[str]
     full_amount: Optional[PositiveInt]
 
     @staticmethod
@@ -22,6 +22,7 @@ class CharityProjectBase(BaseModel):
 
     class Config:
         extra = Extra.forbid
+        min_anystr_length = MIN_LEN_STRING
         schema_extra = {
             'example': {
                 'name': 'На корм пушистикам',
@@ -34,8 +35,8 @@ class CharityProjectBase(BaseModel):
 class CharityProjectCreate(CharityProjectBase):
     """Pydantic-схема для создания проекта."""
 
-    name: str = Field(..., min_length=MIN_LEN_STRING, max_length=MAX_LEN_NAME)
-    description: str = Field(..., min_length=MIN_LEN_STRING)
+    name: str = Field(..., max_length=MAX_LEN_NAME)
+    description: str
     full_amount: PositiveInt
 
 

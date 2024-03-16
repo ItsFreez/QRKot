@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Integer
-from sqlalchemy.orm import validates
+from sqlalchemy import Boolean, CheckConstraint, Column, DateTime, Integer
 
 from app.core.constants import DEFAULT_INV_AMOUNT, MIN_FULL_AMOUNT
 from app.core.db import Base
@@ -18,8 +17,13 @@ class ProjectDonationAbstractModel(Base):
     create_date = Column(DateTime, default=datetime.utcnow)
     close_date = Column(DateTime)
 
-    @validates('full_amount')
-    def validate_full_amount(self, key, value):
-        if value < MIN_FULL_AMOUNT:
-            raise ValueError('Значение должно быть больше 0!')
-        return value
+    __table_args__ = (
+        CheckConstraint(
+            f'full_amount >= {MIN_FULL_AMOUNT}',
+            name='check_full_amount_positive'
+        ),
+        CheckConstraint(
+            'full_amount >= invested_amount',
+            name='check_full_not_less_invested'
+        ),
+    )

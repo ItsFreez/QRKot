@@ -35,11 +35,17 @@ async def create_project(
     """Эндпоинт для создания проектов (только суперюзер)."""
     await check_name_duplicate(project.name, session)
     new_project = await charity_project_crud.create(
-        project, session
+        project, session, commit=False
     )
-    new_project = await investment(
-        new_project, Donation, session
+    open_objs = await charity_project_crud.get_open_objects(
+        Donation, session
     )
+    if open_objs:
+        changed_objs = investment(new_project, open_objs)
+        for obj in changed_objs:
+            session.add(obj)
+    await session.commit()
+    await session.refresh(new_project)
     return new_project
 
 
@@ -65,7 +71,7 @@ async def partially_update_project(
     await check_invested_amounts(
         project, obj_in_data
     )
-    project = await charity_project_crud.update_project(
+    project = await charity_project_crud.update(
         project, obj_in, session
     )
     return project
@@ -87,7 +93,7 @@ async def remove_project(
         project_id, session
     )
     await check_actuallity_project(project)
-    project = await charity_project_crud.remove_project(
+    project = await charity_project_crud.remove(
         project, session
     )
     return project
