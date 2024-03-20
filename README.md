@@ -55,11 +55,11 @@ http://127.0.0.1:8000/redoc
 ***1. Клонировать репозиторий и перейти в папку c проектом***
 
 ```shell
-git clone git@github.com:ItsFreez/cat_charity_fund.git
+git clone git@github.com:ItsFreez/QRKot.git
 ```
 
 ```shell
-cd cat_charity_fund
+cd QRKot
 ```
 
 ***2. Cоздать и активировать виртуальное окружение***
